@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSON task</title>
+    <style>
+        body { font-family:'Times New Roman', Times, serif; margin: 20px; }
+        section { margin-bottom: 20px; cursor: pointer; }
+        pre { background-color: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+
+    </style>
+</head>
+<body>
+
+<script>
+    const fetchData = async () => await (await fetch('https://jsonplaceholder.typicode.com/photos')).json();
+
+    const fetchAndDisplayData = async (selectedValues) => {
+        try {
+            const jsonData = await fetchData();
+            const selectedData = jsonData.filter(item => selectedValues.includes(item.id));
+            const table = `<table><tr><th>ID</th><th>Title</th><th>URL</th></tr>${selectedData.map(item => `<tr><td>${item.id}</td><td>${item.title}</td><td>${item.url}</td></tr>`).join('')}</table>`;
+            document.body.innerHTML += table;
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    const generateValues = (start, end, step, loopType) => {
+        const values = [];
+        switch (loopType) {
+            case 'for':
+                for (let i = start; i <= end; i += step) {
+                    values.push(i);
+                }
+                break;
+            case 'while':
+                let currentWhile = start;
+                while (currentWhile <= end) {
+                    values.push(currentWhile);
+                    currentWhile += step;
+                }
+                break;
+            case 'do-while':
+                let currentDoWhile = start;
+                do {
+                    values.push(currentDoWhile);
+                    currentDoWhile += step;
+                } while (currentDoWhile <= end);
+                break;
+            default:
+                break;
+        }
+        return values;
+    };
+
+    const multiplesOfSix = generateValues(200, 500, 6, 'for');
+    const oddNumbers = generateValues(1, 187, 2, 'while');
+    const evenNumbers = generateValues(50, 100, 2, 'do-while');
+    const factorsOf432 = generateValues(1, 432, 1, 'for').filter(divisor => 432 % divisor === 0);
+
+    const values = {
+        1: multiplesOfSix,
+        2: oddNumbers,
+        3: evenNumbers,
+        4: factorsOf432
+    };
+
+    Object.entries(values).forEach(([id, array]) => {
+        document.write(`
+            <section onclick="fetchAndDisplayData(${JSON.stringify(array)})">
+                <h2>Values ${id}</h2>
+                <pre>${array}</pre>
+            </section>
+        `);
+    });
+</script>
+
+</body>
+</html>
